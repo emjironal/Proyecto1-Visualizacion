@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:proyecto1/grafico_jerarquico.dart';
+import 'datos.dart';
 
 void main() => runApp(
   MaterialApp(
