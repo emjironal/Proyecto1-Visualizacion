@@ -10,11 +10,11 @@ class Data
     cartago = new List(),
     limon = new List(),
     guanacaste = new List(),
-    puntarenas = new List();
+    puntarenas = new List(),
+    hombres = new List(),
+    mujeres = new List();
 
-  Data(){loadData();}
-
-  void loadData() async
+  Future<void> loadData() async
   {
     sanjose.addAll(await read_csv('assets/data/sanjose.csv'));
     cartago.addAll(await read_csv('assets/data/cartago.csv'));
@@ -23,6 +23,8 @@ class Data
     guanacaste.addAll(await read_csv('assets/data/guanacaste.csv'));
     puntarenas.addAll(await read_csv('assets/data/puntarenas.csv'));
     limon.addAll(await read_csv('assets/data/limon.csv'));
+    hombres.addAll(await read_csv('assets/data/hombres.csv'));
+    mujeres.addAll(await read_csv('assets/data/mujeres.csv'));
   }
 
   static Data getInstance() => instance;
