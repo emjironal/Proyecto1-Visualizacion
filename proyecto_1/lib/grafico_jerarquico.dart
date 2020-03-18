@@ -70,7 +70,7 @@ class GraficoJerarquicoState extends State<GraficoJerarquico>
       ),
       new CircularStackEntry(
         getDatosProvincia(Data.getInstance().limon),
-        rankKey: 'Limon',
+        rankKey: 'Limón',
       ),
       new CircularStackEntry(
         getDatosProvincia(Data.getInstance().cartago),
