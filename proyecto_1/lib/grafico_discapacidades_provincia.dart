@@ -1,74 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:loading/indicator/ball_pulse_indicator.dart';
-import 'package:loading/loading.dart';
 import 'package:random_color/random_color.dart';
 import 'package:charts_flutter/flutter.dart';
 import 'datos.dart';
-import 'grafico_discapacidades_provincia.dart';
+import 'grafico_edades_discapacidades.dart';
 
-class GraficoJerarquico extends StatefulWidget
-{  
+class GraficoDiscapacidad extends StatefulWidget
+{
+  final int provincia;
+
+  GraficoDiscapacidad(this.provincia);
+
   @override
-  State<StatefulWidget> createState() => GraficoJerarquicoState();
+  State<StatefulWidget> createState() => GraficoDiscapacidadState(provincia);
 }
 
-class GraficoJerarquicoState extends State<GraficoJerarquico>
+class GraficoDiscapacidadState extends State<GraficoDiscapacidad>
 {
-  Widget _widget;
+  final int provincia;
 
-  GraficoJerarquicoState(){isLoading();}
+  GraficoDiscapacidadState(this.provincia);
 
   @override
   Widget build(BuildContext context)
   {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Provincias"),
+        title: Text("Discapacidades"),
         centerTitle: true
       ),
       body: Container(
         color: Colors.white,
         child: Center(
-          child: _widget,
+          child: _getGrafico(),
         ),
       ),
     );
   }
 
-  void isLoading() async
-  {
-    Data data = Data.getInstance();
-    if(data.provincias.isEmpty)
-    {
-      _widget = Loading(indicator: BallPulseIndicator(), size: 100.0,color: Colors.indigo);
-      await data.loadData();
-      setState(()
-      {
-        _widget = _getGrafico();
-      });
-    }
-    else
-    {
-      _widget = _getGrafico();
-    }
-  }
-
   Widget _getGrafico()
   {
     return new PieChart(
-      getDatosProvincia(),
+      getDatosDiscapacidad(),
       animate: false,
       defaultRenderer: new ArcRendererConfig(
         arcWidth: 80,
         arcRendererDecorators: [
           new ArcLabelDecorator(
-            labelPosition: ArcLabelPosition.inside,
+            labelPosition: ArcLabelPosition.auto,
           )
         ]
       ),
       behaviors: [
         new ChartTitle(
-          "Discapacitados por provincia",
+          "Tipos de discapacidades en ${Data.getInstance().provincias[provincia].nombre}",
           subTitle: "Presione alguna sección\n para más información",
           behaviorPosition: BehaviorPosition.top
         ),
@@ -76,44 +60,45 @@ class GraficoJerarquicoState extends State<GraficoJerarquico>
           position: BehaviorPosition.bottom,
           horizontalFirst: false,
           cellPadding: new EdgeInsets.only(right: 5.0, bottom: 5.0),
-          desiredMaxRows: 3
         )
       ],
       selectionModels: [
         new SelectionModelConfig(
           changedListener: (model)
           {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => GraficoDiscapacidad(model.selectedDatum[0].datum.id)));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => GraficoEdad(provincia, model.selectedDatum[0].datum.id)));
           },
         )
       ],
     );
   }
   
-  List<Series<DataChart, String>> getDatosProvincia()
+  List<Series<DataChart, String>> getDatosDiscapacidad()
   {
     RandomColor _randomColor = RandomColor(14); //6, 10, 17, 25 opciones
-    List<DataChart> datosProvincia = new List();
-    List<Series<DataChart, String>> datosProvinciaSerie = new List();
+    List<DataChart> datosDiscapacidades = new List();
+    List<Series<DataChart, String>> datosDiscapacidadesSerie = new List();
     List colores = _randomColor.randomColors(
-      count: Data.getInstance().provincias.length,
+      count: Data.getInstance().provincias[provincia].datos[0].length, //numero de discapacidades
       colorBrightness: ColorBrightness.dark,
       colorSaturation: ColorSaturation.highSaturation
     );
 
-    for(int i = 0; i < Data.getInstance().provincias.length; i++)
+    int k = 2;
+    while(k < Data.getInstance().provincias[provincia].datos[0].length - 1)
     {
       int total = 0;
-      for(int j = 1; j < Data.getInstance().provincias[i].datos.length; j++)
+      for(int j = 1; j < Data.getInstance().provincias[provincia].datos.length; j++)
       {
-        total += Data.getInstance().provincias[i].datos[j][1];
+        total += Data.getInstance().provincias[provincia].datos[j][k];
       }
-      datosProvincia.add(new DataChart(i, Data.getInstance().provincias[i].nombre, total));
+      datosDiscapacidades.add(new DataChart(k, Data.getInstance().provincias[provincia].datos[0][k], total));
+      k++;
     }
 
-    datosProvinciaSerie.add(new Series(
-      data: datosProvincia,
-      id: "Provincias",
+    datosDiscapacidadesSerie.add(new Series(
+      data: datosDiscapacidades,
+      id: "Discapacidades",
       domainFn: (DataChart data, _) => data.name,
       measureFn: (DataChart data, _) => data.value,
       colorFn: (datum, index) => new Color(
@@ -122,10 +107,10 @@ class GraficoJerarquicoState extends State<GraficoJerarquico>
         g: colores[index].green,
         a: colores[index].alpha
       ),
-      displayName: "Provincias",
+      displayName: "Discapacidades",
       labelAccessorFn: (datum, index) => datum.value.toString(),
     ));
 
-    return datosProvinciaSerie;
+    return datosDiscapacidadesSerie;
   }
 }
