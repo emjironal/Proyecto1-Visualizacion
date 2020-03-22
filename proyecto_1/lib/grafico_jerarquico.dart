@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_circular_chart/flutter_circular_chart.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:random_color/random_color.dart';
+import 'package:charts_flutter/flutter.dart';
 import 'datos.dart';
+import 'grafico_discapacidades_provincia.dart';
 
 class GraficoJerarquico extends StatefulWidget
 {  
@@ -22,7 +23,7 @@ class GraficoJerarquicoState extends State<GraficoJerarquico>
   {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Gráfico Circular Radial"),
+        title: Text("Provincias"),
         centerTitle: true
       ),
       body: Container(
@@ -37,7 +38,7 @@ class GraficoJerarquicoState extends State<GraficoJerarquico>
   void isLoading() async
   {
     Data data = Data.getInstance();
-    if(data.alajuela.isEmpty)
+    if(data.provincias.isEmpty)
     {
       _widget = Loading(indicator: BallPulseIndicator(), size: 100.0,color: Colors.indigo);
       await data.loadData();
@@ -54,59 +55,77 @@ class GraficoJerarquicoState extends State<GraficoJerarquico>
 
   Widget _getGrafico()
   {
-    final GlobalKey<AnimatedCircularChartState> _chartKey = new GlobalKey<AnimatedCircularChartState>();
-    List<CircularStackEntry> data = <CircularStackEntry>[
-      new CircularStackEntry(
-        getDatosProvincia(Data.getInstance().alajuela),
-        rankKey: 'Alajuela',
+    return new PieChart(
+      getDatosProvincia(),
+      animate: false,
+      defaultRenderer: new ArcRendererConfig(
+        arcWidth: 80,
+        arcRendererDecorators: [
+          new ArcLabelDecorator(
+            labelPosition: ArcLabelPosition.inside,
+          )
+        ]
       ),
-      new CircularStackEntry(
-        getDatosProvincia(Data.getInstance().heredia),
-        rankKey: 'Heredia',
-      ),
-      new CircularStackEntry(
-        getDatosProvincia(Data.getInstance().sanjose),
-        rankKey: 'San José',
-      ),
-      new CircularStackEntry(
-        getDatosProvincia(Data.getInstance().limon),
-        rankKey: 'Limón',
-      ),
-      new CircularStackEntry(
-        getDatosProvincia(Data.getInstance().cartago),
-        rankKey: 'Cartago',
-      ),
-      new CircularStackEntry(
-        getDatosProvincia(Data.getInstance().guanacaste),
-        rankKey: 'Guanacaste',
-      ),
-      new CircularStackEntry(
-        getDatosProvincia(Data.getInstance().puntarenas),
-        rankKey: 'Puntarenas',
-      ),
-    ];
-    return new AnimatedCircularChart(
-      key: _chartKey,
-      size: const Size(300.0, 300.0),
-      initialChartData: data,
-      chartType: CircularChartType.Radial,
+      behaviors: [
+        new ChartTitle(
+          "Discapacitados por provincia",
+          subTitle: "Presione alguna sección\n para más información",
+          behaviorPosition: BehaviorPosition.top
+        ),
+        new DatumLegend(
+          position: BehaviorPosition.bottom,
+          horizontalFirst: false,
+          cellPadding: new EdgeInsets.only(right: 5.0, bottom: 5.0),
+          desiredMaxRows: 3
+        )
+      ],
+      selectionModels: [
+        new SelectionModelConfig(
+          changedListener: (model)
+          {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => GraficoDiscapacidad(model.selectedDatum[0].datum.id)));
+          },
+        )
+      ],
     );
   }
-
-  List<CircularSegmentEntry> getDatosProvincia(List provincia)
+  
+  List<Series<DataChart, String>> getDatosProvincia()
   {
-    RandomColor _randomColor = RandomColor(10);
-    List<CircularSegmentEntry> datosProvincia = new List();
-    for(int i = 1; i < provincia.length; i++)
+    RandomColor _randomColor = RandomColor(14); //6, 10, 17, 25 opciones
+    List<DataChart> datosProvincia = new List();
+    List<Series<DataChart, String>> datosProvinciaSerie = new List();
+    List colores = _randomColor.randomColors(
+      count: Data.getInstance().provincias.length,
+      colorBrightness: ColorBrightness.dark,
+      colorSaturation: ColorSaturation.highSaturation
+    );
+
+    for(int i = 0; i < Data.getInstance().provincias.length; i++)
     {
-      datosProvincia.add(
-        new CircularSegmentEntry(
-          provincia[i][1].toDouble(), //valor
-          _randomColor.randomColor(colorBrightness: ColorBrightness.light), //color
-          rankKey: provincia[i][0] //nombre
-        )
-      );
+      int total = 0;
+      for(int j = 1; j < Data.getInstance().provincias[i].datos.length; j++)
+      {
+        total += Data.getInstance().provincias[i].datos[j][1];
+      }
+      datosProvincia.add(new DataChart(i, Data.getInstance().provincias[i].nombre, total));
     }
-    return datosProvincia;
+
+    datosProvinciaSerie.add(new Series(
+      data: datosProvincia,
+      id: "Provincias",
+      domainFn: (DataChart data, _) => data.name,
+      measureFn: (DataChart data, _) => data.value,
+      colorFn: (datum, index) => new Color(
+        r: colores[index].red,
+        b: colores[index].blue,
+        g: colores[index].green,
+        a: colores[index].alpha
+      ),
+      displayName: "Provincias",
+      labelAccessorFn: (datum, index) => datum.value.toString(),
+    ));
+
+    return datosProvinciaSerie;
   }
 }

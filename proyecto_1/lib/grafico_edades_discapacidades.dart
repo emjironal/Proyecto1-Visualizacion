@@ -61,6 +61,7 @@ class GraficoEdadState extends State<GraficoEdad>
           position: BehaviorPosition.bottom,
           horizontalFirst: false,
           cellPadding: new EdgeInsets.only(right: 5.0, bottom: 5.0),
+          desiredMaxRows: 4
         )
       ],
     );
