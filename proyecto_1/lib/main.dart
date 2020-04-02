@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:proyecto1/grafico_jerarquico.dart';
+import 'package:proyecto1/grafico_barras_provincia.dart';
 
 void main() => runApp(
   MaterialApp(
@@ -16,7 +17,10 @@ class MyApp extends StatelessWidget
   @override
   Widget build(BuildContext context)
   {
-    final buttons = [["Gráfico jerárquico", GraficoJerarquico()]];
+    final buttons = [
+      ["Gráfico jerárquico", GraficoJerarquico()],
+      ["Gráfico barras", GraficoBarrasProvincia()]
+    ];
     return Scaffold(
         appBar: AppBar(
           title: Text("Proyecto 1"),
