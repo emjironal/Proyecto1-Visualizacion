@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto1/interface_grafico.dart';
 import 'package:random_color/random_color.dart';
 import 'package:charts_flutter/flutter.dart';
 import 'datos.dart';
@@ -14,7 +15,7 @@ class GraficoDiscapacidad extends StatefulWidget
   State<StatefulWidget> createState() => GraficoDiscapacidadState(provincia);
 }
 
-class GraficoDiscapacidadState extends State<GraficoDiscapacidad>
+class GraficoDiscapacidadState extends State<GraficoDiscapacidad> implements Grafico
 {
   final int provincia;
 
@@ -31,16 +32,17 @@ class GraficoDiscapacidadState extends State<GraficoDiscapacidad>
       body: Container(
         color: Colors.white,
         child: Center(
-          child: _getGrafico(),
+          child: getGrafico(),
         ),
       ),
     );
   }
 
-  Widget _getGrafico()
+  @override
+  Widget getGrafico()
   {
     return new PieChart(
-      getDatosDiscapacidad(),
+      getDatos(),
       animate: false,
       defaultRenderer: new ArcRendererConfig(
         arcWidth: 80,
@@ -66,14 +68,16 @@ class GraficoDiscapacidadState extends State<GraficoDiscapacidad>
         new SelectionModelConfig(
           changedListener: (model)
           {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => GraficoEdad(provincia, model.selectedDatum[0].datum.id)));
+            if(model.selectedDatum.length > 0)
+              Navigator.push(context, MaterialPageRoute(builder: (context) => GraficoEdad(provincia, model.selectedDatum[0].datum.id)));
           },
         )
       ],
     );
   }
   
-  List<Series<DataChart, String>> getDatosDiscapacidad()
+  @override
+  List<Series<DataChart, String>> getDatos()
   {
     RandomColor _randomColor = RandomColor(14); //6, 10, 17, 25 opciones
     List<DataChart> datosDiscapacidades = new List();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
+import 'package:proyecto1/interface_grafico.dart';
 import 'package:random_color/random_color.dart';
 import 'package:charts_flutter/flutter.dart';
 import 'datos.dart';
@@ -12,7 +13,7 @@ class GraficoJerarquico extends StatefulWidget
   State<StatefulWidget> createState() => GraficoJerarquicoState();
 }
 
-class GraficoJerarquicoState extends State<GraficoJerarquico>
+class GraficoJerarquicoState extends State<GraficoJerarquico> implements Grafico
 {
   Widget _widget;
 
@@ -44,19 +45,20 @@ class GraficoJerarquicoState extends State<GraficoJerarquico>
       await data.loadData();
       setState(()
       {
-        _widget = _getGrafico();
+        _widget = getGrafico();
       });
     }
     else
     {
-      _widget = _getGrafico();
+      _widget = getGrafico();
     }
   }
 
-  Widget _getGrafico()
+  @override
+  Widget getGrafico()
   {
     return new PieChart(
-      getDatosProvincia(),
+      getDatos(),
       animate: false,
       defaultRenderer: new ArcRendererConfig(
         arcWidth: 80,
@@ -83,14 +85,16 @@ class GraficoJerarquicoState extends State<GraficoJerarquico>
         new SelectionModelConfig(
           changedListener: (model)
           {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => GraficoDiscapacidad(model.selectedDatum[0].datum.id)));
+            if(model.selectedDatum.length > 0)
+              Navigator.push(context, MaterialPageRoute(builder: (context) => GraficoDiscapacidad(model.selectedDatum[0].datum.id)));
           },
         )
       ],
     );
   }
   
-  List<Series<DataChart, String>> getDatosProvincia()
+  @override
+  List<Series<DataChart, String>> getDatos()
   {
     RandomColor _randomColor = RandomColor(14); //6, 10, 17, 25 opciones
     List<DataChart> datosProvincia = new List();

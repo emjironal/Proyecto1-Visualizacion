@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto1/interface_grafico.dart';
 import 'package:random_color/random_color.dart';
 import 'package:charts_flutter/flutter.dart';
 import 'datos.dart';
@@ -14,7 +15,7 @@ class GraficoEdad extends StatefulWidget
   State<StatefulWidget> createState() => GraficoEdadState(provincia, discapacidad);
 }
 
-class GraficoEdadState extends State<GraficoEdad>
+class GraficoEdadState extends State<GraficoEdad> implements Grafico
 {
   final int provincia;
   final int discapacidad;
@@ -32,16 +33,17 @@ class GraficoEdadState extends State<GraficoEdad>
       body: Container(
         color: Colors.white,
         child: Center(
-          child: _getGrafico(),
+          child: getGrafico(),
         ),
       ),
     );
   }
 
-  Widget _getGrafico()
+  @override
+  Widget getGrafico()
   {
     return new PieChart(
-      getDatosEdad(),
+      getDatos(),
       animate: false,
       defaultRenderer: new ArcRendererConfig(
         arcWidth: 80,
@@ -67,7 +69,8 @@ class GraficoEdadState extends State<GraficoEdad>
     );
   }
   
-  List<Series<DataChart, String>> getDatosEdad()
+  @override
+  List<Series<DataChart, String>> getDatos()
   {
     RandomColor _randomColor = RandomColor(14); //6, 10, 17, 25 opciones
     List<DataChart> datosEdades = new List();
@@ -81,12 +84,7 @@ class GraficoEdadState extends State<GraficoEdad>
     int k = 1;
     while(k < Data.getInstance().provincias[provincia].datos.length - 1)
     {
-      int total = 0;
-      for(int j = 1; j < Data.getInstance().provincias[provincia].datos[k].length; j++)
-      {
-        total += Data.getInstance().provincias[provincia].datos[k][j];
-      }
-      datosEdades.add(new DataChart(k, Data.getInstance().provincias[provincia].datos[k][0], total));
+      datosEdades.add(new DataChart(k, Data.getInstance().provincias[provincia].datos[k][0], Data.getInstance().provincias[provincia].datos[k][discapacidad]));
       k++;
     }
 
