@@ -1,3 +1,5 @@
+import 'package:proyecto1/enum_tipo_data.dart';
+
 import 'read_csv.dart';
 
 class Dato
@@ -10,7 +12,7 @@ class Dato
 
 class Data
 {
-  static final Data instance = new Data();
+  static final Data _instance = new Data();
 
   final List<Dato> provincias = new List<Dato>();
   final List<Dato> sexo = new List<Dato>();
@@ -28,7 +30,29 @@ class Data
     sexo.add(new Dato("Mujeres", await read_csv('assets/data/mujeres.csv')));
   }
 
-  static Data getInstance() => instance;
+  Dato getDatos(String tipo)
+  {
+    Dato dato;
+    this.sexo.forEach((sexo)
+    {
+      if(sexo.nombre == tipo)
+      {
+        dato = sexo;
+      } //end if
+    }); //end forEach
+
+    this.provincias.forEach((provincia)
+    {
+      if(provincia.nombre == tipo)
+      {
+        dato = provincia;
+      }
+    }); //end forEach
+
+    return dato;
+  } //end getDatos
+
+  static Data getInstance() => _instance;
 }
 
 class DataChart

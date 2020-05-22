@@ -1,0 +1,12 @@
+enum TipoData
+{
+  SANJOSE,
+  CARTAGO,
+  AJAUELA,
+  HEREDIA,
+  GUANACASTE,
+  PUNTARENAS,
+  LIMON,
+  MUJERES,
+  HOMBRES
+}

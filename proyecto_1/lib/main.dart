@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:proyecto1/grafico_burbuja_provincia.dart';
 import 'package:proyecto1/grafico_jerarquico.dart';
 import 'package:proyecto1/grafico_barras_provincia.dart';
 
@@ -19,7 +20,8 @@ class MyApp extends StatelessWidget
   {
     final buttons = [
       ["Gráfico jerárquico", GraficoJerarquico()],
-      ["Gráfico barras", GraficoBarrasProvincia()]
+      ["Gráfico barras", GraficoBarrasProvincia()],
+      ["Gráfico burbujas", GraficoBurbuja()]
     ];
     return Scaffold(
         appBar: AppBar(
