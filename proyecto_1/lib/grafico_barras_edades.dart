@@ -12,8 +12,8 @@ class GraficoBarrasEdades extends GraficoBarras
   GraficoBarrasEdades(this.provincia, this.discapacidad)
   {
     super.datos = new DatosEdades(this.provincia, this.discapacidad);
-    super.appTitle = "Provincia";
-    super.title = "Discapacitados por provincia";
+    super.appTitle = "Edades";
+    super.title = "Rangos de edades en ${Data.getInstance().provincias[provincia].nombre}";
     super.subtitle = "${Data.getInstance().provincias[provincia].datos[0][discapacidad]}";
   }
   
